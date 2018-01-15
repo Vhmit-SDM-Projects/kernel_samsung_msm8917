@@ -46,6 +46,10 @@ DEFINE_MUTEX(LP_STOP_MODE_LOCK);
 
 DEFINE_LED_TRIGGER(bl_led_trigger);
 
+#ifdef CONFIG_LAZYPLUG
+extern void lazyplug_enter_lazy(bool enter, bool video);
+#endif
+
 void mdss_dsi_panel_pwm_cfg(struct mdss_dsi_ctrl_pdata *ctrl)
 {
 	if (ctrl->pwm_pmi)
@@ -993,6 +997,10 @@ static int mdss_dsi_panel_on(struct mdss_panel_data *pdata)
 		return -EINVAL;
 	}
 
+#ifdef CONFIG_LAZYPLUG
+	lazyplug_enter_lazy(false, false);
+#endif
+
 	pinfo = &pdata->panel_info;
 	ctrl = container_of(pdata, struct mdss_dsi_ctrl_pdata,
 				panel_data);
@@ -1258,6 +1266,10 @@ static int mdss_dsi_panel_off(struct mdss_panel_data *pdata)
 #endif
 
 	mdss_dsi_panel_off_hdmi(ctrl, pinfo);
+
+#ifdef CONFIG_LAZYPLUG
+	lazyplug_enter_lazy(true, false);
+#endif
 
 end:
 	/* clear idle state */
